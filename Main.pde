@@ -70,6 +70,12 @@ Character c;
 ArrayList <Bullet> bullets = new ArrayList <Bullet> ();
 ArrayList<Enemy> enemies;
 float maxSpeed = 3;
+int screen = 0;
+int maxHealth = 100;
+float health = 100;
+float healthDecrease = 1;
+int healthBarWidth = 60;
+int score = 0;
 
 void setup() {
   size(600, 600);
@@ -93,6 +99,24 @@ void setup() {
 }
  
 void draw() {
+  if (screen == 0) {
+    initScreen();
+  } else if (screen == 1) {
+    gameScreen();
+  } else if (screen == 2) {
+    gameOverScreen();
+  }
+}
+
+void initScreen() {
+  background(0);
+  textAlign(CENTER);
+  fill(255);
+  textSize(15);
+  text("Click to start", height/2, width/2);
+}
+
+void gameScreen() {
   background(255);
  
   c.loc.add(c.speed);
@@ -105,10 +129,10 @@ void draw() {
   fill(0);
   ellipse(mouse.x, mouse.y, 5, 5);
  
-  if (frameCount%5==0 && mousePressed) {
+  if (frameCount % 5 == 0 && mousePressed) {
     PVector dir = PVector.sub(mouse, c.loc);
     dir.normalize();
-    dir.mult(maxSpeed*3);
+    dir.mult(maxSpeed * 3);
     Bullet b = new Bullet(c.loc, dir);
     bullets.add(b);
   }
@@ -122,6 +146,44 @@ void draw() {
     enemies.get(i).update(c.getLocX(),c.getLocY());
     enemies.get(i).draw();
   }
+  
+  healthBar();
+  printScore();
+}
+
+void gameOverScreen() {
+  background(0);
+  textAlign(CENTER);
+  fill(255);
+  textSize(30);
+  text("Game Over", height/2, width/2 - 20);
+  textSize(15);
+  text("Click to Restart", height/2, width/2 + 10);
+}
+
+void startGame() {
+  screen=1;
+}
+
+void gameOver() {
+  screen = 2;
+}
+
+void restart() {
+  score = 0;
+  health = maxHealth;
+  c.loc.x = width/2;
+  c.loc.y = height/2;
+  screen = 0;
+}
+
+public void mousePressed() {
+  if (screen==0) {
+    startGame();
+  }
+  if (screen==2) {
+    restart();
+  }
 }
 
 void keyPressed() {
@@ -134,4 +196,38 @@ void keyPressed() {
 void keyReleased() {
   if (key == 'w' || key == 's')    { c.speed.y = 0; }
   if (key == 'a' || key == 'd') { c.speed.x = 0; }
+}
+
+void healthBar() {
+  noStroke();
+  fill(236, 240, 241);
+  rectMode(CORNER);
+  rect(c.loc.x - (healthBarWidth/2), c.loc.y - 30, healthBarWidth, 5);
+  if (health > 60) {
+    fill(46, 204, 113);
+  } else if (health > 30) {
+    fill(230, 126, 34);
+  } else {
+    fill(231, 76, 60);
+  }
+  rectMode(CORNER);
+  rect(c.loc.x - (healthBarWidth/2), c.loc.y - 30, healthBarWidth*(health/maxHealth), 5);
+}
+
+void decreaseHealth() {
+  health -= healthDecrease;
+  if (health <= 0) {
+    gameOver();
+  }
+}
+
+void score() {
+  score++;
+}
+
+void printScore() {
+  textAlign(CENTER);
+  fill(0);
+  textSize(30);
+  text(score, height/2, 50);
 }
