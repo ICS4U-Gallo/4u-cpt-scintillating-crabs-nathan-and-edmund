@@ -48,11 +48,11 @@ class Bullet extends PVector {
     add(vel);
   }
  
-void timeAlive() {
- if(frameRate % 30 == 0) {
-   this.time += 1;
- }
-}
+  void timeAlive() {
+    if(frameRate % 30 == 0) {
+      this.time += 1;
+    }
+  }
   void display() {
     fill(0, 0, 255);
     ellipse(x, y, radius, radius);
@@ -64,8 +64,8 @@ class Enemy {
   PVector speed;
   int diameter = 20;
   int index = 0;
-  float eHp = 10 + score/10;
-  float eDmg = 5;
+  float eHp = 5 + score/10;
+  float eDmg = 2;
   
   Enemy(PVector loc, PVector speed) {
     this.loc = loc;
@@ -90,13 +90,13 @@ class Enemy {
     return (this.eHp <= 0);
   }
   
-   String drugDrone() {
+  String drugDrone() {
     
-    String[] r= {"I love drugs"," I need drugs to live", "Try some drugs", " "};
-        if (frameCount % 60 == 0) {
+  String[] r= {"I love drugs"," I need drugs to live", "Try some drugs", " "};
+    if (frameCount % 60 == 0) {
           int rindex = int(random(r.length));
           index = rindex;
-        } 
+     } 
     return r[index];
   }
   
@@ -108,11 +108,9 @@ class Enemy {
     fill(255,0,0);
     ellipse(loc.x - 5, loc.y - 4, diameter/4, diameter/4);
     ellipse(loc.x + 5, loc.y - 4, diameter/4, diameter/4);
-    
 
-      textSize(10);
-      text(drugDrone(), this.loc.x - diameter/2, this.loc.y - 30);
-  
+    textSize(10);
+    text(drugDrone(), this.loc.x - diameter/2, this.loc.y - 30);
   }
 }
 
@@ -121,21 +119,16 @@ ArrayList <Bullet> bullets = new ArrayList <Bullet> ();
 ArrayList<Enemy> enemies;
 float maxSpeed = 3;
 int screen = 0;
-
-
-float healthDecrease = 1;
 int healthBarWidth = 60;
 int score = 0;
 float xo;
 float yo;
 
-
 void setup() {
   size(600, 600);
   xo = width/2;
   yo = height/2;
-  
-  
+    
   PVector loc = new PVector(0, 0);
   PVector speed = new PVector();
   c = new Character(loc, speed);
@@ -155,18 +148,15 @@ void setup() {
 }
  
 void draw() {
-   translate(xo,yo);
+  translate(xo,yo);
       
-  
   if (screen == 0) {
     initScreen();
   } else if (screen == 1) {
     gameScreen();      
   } else if (screen == 2) {
     gameOverScreen();
-  }
-  
-  
+  }   
 }
 
 void initScreen() {
@@ -186,7 +176,7 @@ void gameScreen() {
   fill(255);
   ellipse(c.loc.x, c.loc.y, 10, 10);
  
-PVector mouse = new PVector(mouseX - xo, mouseY - yo);
+  PVector mouse = new PVector(mouseX - xo, mouseY - yo);
   fill(0);
   ellipse(mouse.x, mouse.y, 5, 5);
  
@@ -209,24 +199,25 @@ PVector mouse = new PVector(mouseX - xo, mouseY - yo);
   for (Bullet b : bullets) {
     b.update();
     b.display();
+    b.timeAlive();
   }
   
    for (int i = 0; i < bullets.size() - 1; i ++) {
      for(int j = 0; j < enemies.size() - 1; j++) {
           float dx = enemies.get(j).loc.x - bullets.get(i).x;
-            float dy = enemies.get(j).loc.y - bullets.get(i).y;
-            float dist = sqrt(dx * dx + dy * dy);
-            if (dist < (enemies.get(j).diameter/2 + bullets.get(i).radius)) {
-              enemies.get(j).takeDmg(bullets.get(i).bDmg);
-              bullets.remove(i);
+          float dy = enemies.get(j).loc.y - bullets.get(i).y;
+          float dist = sqrt(dx * dx + dy * dy);
+          if (dist < (enemies.get(j).diameter/2 + bullets.get(i).radius)) {
+            enemies.get(j).takeDmg(bullets.get(i).bDmg);
+            bullets.remove(i);
               
-              if(enemies.get(j).dead()) {
-                enemies.remove(j);
-                score();
-              } else if( bullets.get(i).time > 2){
-                bullets.remove(i);
-              }
+            if(enemies.get(j).dead()) {
+              enemies.remove(j);
+              score();
+            } else if( bullets.get(i).time > 2){
+              bullets.remove(i);
             }
+          }
      }
    }
   
@@ -240,8 +231,7 @@ PVector mouse = new PVector(mouseX - xo, mouseY - yo);
             float dx = enemies.get(j).loc.x - enemies.get(i).loc.x;
             float dy = enemies.get(j).loc.y - enemies.get(i).loc.y;
             float dist = sqrt(dx * dx + dy * dy);
-            if (dist < (enemies.get(j).diameter/2 + enemies.get(i).diameter/2)) {
-                
+            if (dist < (enemies.get(j).diameter/2 + enemies.get(i).diameter/2)) {                
                 float normalX = dx / dist;
                 float normalY = dy / dist;
                 float midpointX = (enemies.get(i).loc.x + enemies.get(j).loc.x) / 2;
@@ -261,20 +251,19 @@ PVector mouse = new PVector(mouseX - xo, mouseY - yo);
             }
         }
     }
-  for (int i = 0; i < enemies.size(); i++) {
+    
+    for (int i = 0; i < enemies.size(); i++) {
             float dx = enemies.get(i).loc.x - c.loc.x;
             float dy = enemies.get(i).loc.y - c.loc.y;
             float dist = sqrt(dx * dx + dy * dy);
             
             if (dist < (enemies.get(i).diameter/2 + c.diameter/2)) { 
-              if( frameCount % 20 == 0) {
+               if( frameCount % 20 == 0) {
                 c.takeDmg(enemies.get(i).eDmg);
-              }  
-              
-                
-                gameoverCheck();
+               }                                
+               gameoverCheck();
             }
-  }
+    }
   
   healthBar();
   printScore();
@@ -305,6 +294,9 @@ void restart() {
   c.loc.x = width/2;
   c.loc.y = height/2;
   screen = 0;
+  for(int i = 0; i < enemies.size(); i ++) {
+    enemies.remove(i);
+  }
 }
 
 
